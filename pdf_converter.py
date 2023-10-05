@@ -12,16 +12,23 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email import encoders
 
+def clear():
+  os.system('cls' if os.name == 'not' else 'clear')
+
 EMAIL = config('EMAIL')
 PASSWORD = config('PASSWORD')
+SUPERVISOR_EMAIL = config('SUPERVISOR_EMAIL')
 
 #Connect to Gmail and Download Attachments
+clear()
+print("Logging into mail...")
 mail = imaplib.IMAP4_SSL('imap.gmail.com')
 mail.login(EMAIL, PASSWORD)
 mail.select('inbox')
-status, message_numbers = mail.search(None, '(UNSEEN)', '(FROM "christine@csrcourtreporting.com")')
+status, message_numbers = mail.search(None, '(UNSEEN)', f'(FROM "{SUPERVISOR_EMAIL}")')
+
 if status != 'OK' :
-  print("No new emails found!")
+  print("Error searching for emails.")
   exit()
 
 for message_number in message_numbers[0].split():
@@ -29,4 +36,4 @@ for message_number in message_numbers[0].split():
   email_body = data[0][1]
   mail_info = email.message_from_bytes(email_body)
 
-print(message_numbers[0].split())
+print(f"{len(message_numbers[0].split())} emails found")
